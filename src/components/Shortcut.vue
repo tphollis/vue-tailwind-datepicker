@@ -2,6 +2,7 @@
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 import { injectStrict } from '../utils'
+import { sethours, setMinutes, setSeconds } from 'date-fns'
 import {
   setToCustomShortcutKey,
   setToLastDayKey,
@@ -25,7 +26,13 @@ const props = defineProps<{
   }
 }>()
 
-const setToToday = injectStrict(setToTodayKey)
+const setToToday = () => {
+  const today = new Date();
+  const startOfDay = setSeconds(setMinutes(setHours(today, 0), 0), 0);
+  const endOfDay = setSeconds(setMinutes(setHours(today, 23), 59), 59);
+
+  return [startOfDay, endOfDay];
+}
 const setToYesterday = injectStrict(setToYesterdayKey)
 const setToLastDay = injectStrict(setToLastDayKey)
 const setToThisMonth = injectStrict(setToThisMonthKey)
@@ -63,7 +70,7 @@ const withShortcut = computed(() => {
         <a
           href="#"
           class="vtd-shortcuts block text-sm lg:text-xs px-2 py-2 sm:leading-4 whitespace-nowrap font-medium rounded text-vtd-primary-600 hover:text-vtd-primary-700 transition-colors hover:bg-vtd-secondary-100 focus:bg-vtd-secondary-100 focus:text-vtd-primary-600 dark:hover:bg-vtd-secondary-700 dark:hover:text-vtd-primary-300 dark:text-vtd-primary-400 dark:focus:bg-vtd-secondary-700 dark:focus:text-vtd-primary-300"
-          @click.prevent="setToToday(close)"
+          @click.prevent="() => { const [start, end] = setToToday(); /* Use start and end */ close(); }"
         >
           {{ props.i18n.today }}
         </a>
